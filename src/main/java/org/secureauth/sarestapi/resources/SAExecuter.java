@@ -52,8 +52,7 @@ public class SAExecuter {
     private ClientConfig config = null;
     private Client client=null;
     private static Logger logger=LoggerFactory.getLogger(SAExecuter.class);
-    
-    //Set up our Connection
+
     //Set up our Connection
     private void createConnection() throws Exception{
 
