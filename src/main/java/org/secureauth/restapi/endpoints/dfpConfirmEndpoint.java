@@ -9,8 +9,8 @@ import org.secureauth.sarestapi.util.XMLUtil;
  */
 public class dfpConfirmEndpoint {
 
-    public static String confirmDfp(String host, String port, Boolean ssl, String realm, String appId, String appKey, String userId, String fp_id){
-        SAAccess saAccess =  new SAAccess(host, port, ssl, realm, appId, appKey);
+    public static String confirmDfp(String host, String port, boolean ssl,boolean selfSigned, String realm, String appId, String appKey, String userId, String fp_id){
+        SAAccess saAccess =  new SAAccess(host, port, ssl,selfSigned, realm, appId, appKey);
         DFPConfirmResponse confirmResp = saAccess.DFPConfirm(userId, fp_id);
         if (confirmResp != null){
             String output = XMLUtil.convertObjectToXML(confirmResp);

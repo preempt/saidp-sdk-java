@@ -9,8 +9,8 @@ import org.secureauth.sarestapi.util.XMLUtil;
  */
 public class voiceAuthEndpoint {
 
-    public static String sendOtpByVoice(String host, String port, Boolean ssl, String realm, String appId, String appKey, String userId, String factorId){
-        SAAccess saAccess =  new SAAccess(host, port, ssl, realm, appId, appKey);
+    public static String sendOtpByVoice(String host, String port, boolean ssl,boolean selfSigned, String realm, String appId, String appKey, String userId, String factorId){
+        SAAccess saAccess =  new SAAccess(host, port, ssl,selfSigned, realm, appId, appKey);
         ResponseObject voiceResp = saAccess.deliverOTPByPhone(userId, factorId);
         if (voiceResp != null){
             String output = XMLUtil.convertObjectToXML(voiceResp);

@@ -9,9 +9,9 @@ import org.secureauth.sarestapi.util.XMLUtil;
  */
 public class dfpJsEndpoint {
 
-    public static String getJavaScriptSrc(String host, String port, Boolean ssl, String realm, String appId, String appKey)
+    public static String getJavaScriptSrc(String host, String port, boolean ssl,boolean selfSigned, String realm, String appId, String appKey)
     {
-        SAAccess saAccess =  new SAAccess(host, port, ssl, realm, appId, appKey);
+        SAAccess saAccess =  new SAAccess(host, port, ssl,selfSigned, realm, appId, appKey);
         JSObjectResponse jsSrc = saAccess.javaScriptSrc();
         if (jsSrc != null) {
             String output = XMLUtil.convertObjectToXML(jsSrc);

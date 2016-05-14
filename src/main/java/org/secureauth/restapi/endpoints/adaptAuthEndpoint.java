@@ -9,8 +9,8 @@ import org.secureauth.sarestapi.util.XMLUtil;
  */
 public class adaptAuthEndpoint {
 
-    public static String getAdaptEndpoint(String host, String port, Boolean ssl, String realm, String appId, String appKey, String userId, String endUserIp){
-        SAAccess saAccess =  new SAAccess(host, port, ssl, realm, appId, appKey);
+    public static String getAdaptEndpoint(String host, String port, boolean ssl,boolean selfSigned, String realm, String appId, String appKey, String userId, String endUserIp){
+        SAAccess saAccess =  new SAAccess(host, port, ssl,selfSigned, realm, appId, appKey);
         AdaptiveAuthResponse adaptResp = saAccess.adaptiveAuthQuery(userId, endUserIp);
         if (adaptResp != null){
             String output = XMLUtil.convertObjectToXML(adaptResp);

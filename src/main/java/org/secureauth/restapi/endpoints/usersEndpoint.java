@@ -9,8 +9,8 @@ import org.secureauth.sarestapi.util.XMLUtil;
  */
 public class usersEndpoint {
 
-    public static String getMFAOptions(String host, String port, Boolean ssl, String realm, String appId, String appKey, String userId){
-        SAAccess saAccess =  new SAAccess(host, port, ssl, realm, appId, appKey);
+    public static String getMFAOptions(String host, String port, boolean ssl,boolean selfSigned, String realm, String appId, String appKey, String userId){
+        SAAccess saAccess =  new SAAccess(host, port, ssl,selfSigned, realm, appId, appKey);
         FactorsResponse factors = saAccess.factorsByUser(userId);
         if (factors != null){
             String output = XMLUtil.convertObjectToXML(factors);

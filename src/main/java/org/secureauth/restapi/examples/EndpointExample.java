@@ -15,6 +15,7 @@ public class EndpointExample {
     private static String applianceHost = "host.domain.com";
     private static String appliancePort = "443";
     private static boolean applianceSSL = true;
+    private static boolean selfSigned = true;
     private static String realm = "secureauth1";
     private static String applicationID = "...";
     private static String applicationKey = "...";
@@ -31,7 +32,7 @@ public class EndpointExample {
         System.out.println("++++++++++++++++++Start Test++++++++++++++++++");
 
         //usersEndpoint get XML test.
-        String users = usersEndpoint.getMFAOptions(applianceHost, appliancePort, applianceSSL, realm, applicationID, applicationKey, userId);
+        String users = usersEndpoint.getMFAOptions(applianceHost, appliancePort, applianceSSL,selfSigned, realm, applicationID, applicationKey, userId);
         System.out.println("++++++++++++Start UserEndpoint Test++++++++++++");
         System.out.println(users);
         System.out.println("++++++++++++End UserEndpoint Test++++++++++++");
@@ -42,13 +43,13 @@ public class EndpointExample {
         String voiceFactorId = "Phone1";
 
         //dfpJSendpoint get XML test.
-        String dfpJs = dfpJsEndpoint.getJavaScriptSrc(applianceHost, appliancePort, applianceSSL, realm, applicationID, applicationKey);
+        String dfpJs = dfpJsEndpoint.getJavaScriptSrc(applianceHost, appliancePort, applianceSSL,selfSigned, realm, applicationID, applicationKey);
         System.out.println("++++++++++++Start DFPJSEndpoint Test++++++++++++");
         System.out.println(dfpJs);
         System.out.println("++++++++++++End DFPJSEndpoint Test++++++++++++");
 
         //dfpValidateEndpoint get XML test.
-        String dfpValidate = dfpValidateEndpoint.validateDfp(applianceHost, appliancePort, applianceSSL, realm, applicationID, applicationKey, userId, host_addr, fingerprintJson, accept, accept_charset, accept_encode, accept_lang);
+        String dfpValidate = dfpValidateEndpoint.validateDfp(applianceHost, appliancePort, applianceSSL,selfSigned, realm, applicationID, applicationKey, userId, host_addr, fingerprintJson, accept, accept_charset, accept_encode, accept_lang);
         System.out.println("++++++++++++Start DFPValidate Test++++++++++++");
         System.out.println(dfpValidate);
         System.out.println("++++++++++++End DFPValidate Test++++++++++++");
@@ -76,31 +77,31 @@ public class EndpointExample {
 
 
         //dfpConfirmEndpoint get XML test.
-        String dfpConfirm = dfpConfirmEndpoint.confirmDfp(applianceHost, appliancePort, applianceSSL, realm, applicationID, applicationKey, userId, fp_id);
+        String dfpConfirm = dfpConfirmEndpoint.confirmDfp(applianceHost, appliancePort, applianceSSL,selfSigned, realm, applicationID, applicationKey, userId, fp_id);
         System.out.println("++++++++++++Start DFPConfirm Test++++++++++++");
         System.out.println(dfpConfirm);
         System.out.println("++++++++++++End DFPConfirm Test++++++++++++");
 
         //adaptAuthEndpoint get XML test.
-        String adaptAuth = adaptAuthEndpoint.getAdaptEndpoint(applianceHost, appliancePort, applianceSSL, realm, applicationID, applicationKey, userId, host_addr);
+        String adaptAuth = adaptAuthEndpoint.getAdaptEndpoint(applianceHost, appliancePort, applianceSSL,selfSigned, realm, applicationID, applicationKey, userId, host_addr);
         System.out.println("++++++++++++Start AdaptiveAuth Test++++++++++++");
         System.out.println(adaptAuth);
         System.out.println("++++++++++++End AdaptiveAuth Test++++++++++++");
 
         //emailAuthEndpoint get XML test.
-        String emailAuth = emailAuthEndpoint.sendOtpByEmail(applianceHost, appliancePort, applianceSSL, realm, applicationID, applicationKey, userId, emailFactorId);
+        String emailAuth = emailAuthEndpoint.sendOtpByEmail(applianceHost, appliancePort, applianceSSL,selfSigned, realm, applicationID, applicationKey, userId, emailFactorId);
         System.out.println("++++++++++++Start Deliver OTP By Email Test++++++++++++");
         System.out.println(emailAuth);
         System.out.println("++++++++++++End Deliver OTP By Email Test++++++++++++");
 
         //voiceAuthEndpoint get XML test.
-        String voiceAuth = voiceAuthEndpoint.sendOtpByVoice(applianceHost, appliancePort, applianceSSL, realm, applicationID, applicationKey, userId, voiceFactorId);
+        String voiceAuth = voiceAuthEndpoint.sendOtpByVoice(applianceHost, appliancePort, applianceSSL,selfSigned, realm, applicationID, applicationKey, userId, voiceFactorId);
         System.out.println("++++++++++++Start Deliver OTP By Voice Test++++++++++++");
         System.out.println(voiceAuth);
         System.out.println("++++++++++++End Deliver OTP By Voice Test++++++++++++");
 
         //smsAuthEndpoint get XML test.
-        String smsAuth = smsAuthEndpoint.sendOtpBySMS(applianceHost, appliancePort, applianceSSL, realm, applicationID, applicationKey, userId, smsFactorId);
+        String smsAuth = smsAuthEndpoint.sendOtpBySMS(applianceHost, appliancePort, applianceSSL,selfSigned, realm, applicationID, applicationKey, userId, smsFactorId);
         System.out.println("++++++++++++Start Deliver OTP By SMS Test++++++++++++");
         System.out.println(smsAuth);
         System.out.println("++++++++++++End Deliver OTP By SMS Test++++++++++++");

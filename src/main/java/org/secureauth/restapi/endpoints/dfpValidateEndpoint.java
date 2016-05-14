@@ -9,8 +9,8 @@ import org.secureauth.sarestapi.util.XMLUtil;
  */
 public class dfpValidateEndpoint {
 
-    public static String validateDfp(String host, String port, Boolean ssl, String realm, String appId, String appKey, String userId, String host_addr, String jsonFp, String accept, String accept_charset, String accept_encoding, String accept_lang){
-        SAAccess saAccess =  new SAAccess(host, port, ssl, realm, appId, appKey);
+    public static String validateDfp(String host, String port, boolean ssl,boolean selfSigned, String realm, String appId, String appKey, String userId, String host_addr, String jsonFp, String accept, String accept_charset, String accept_encoding, String accept_lang){
+        SAAccess saAccess =  new SAAccess(host, port, ssl,selfSigned, realm, appId, appKey);
         DFPValidateResponse dfpVal = saAccess.DFPValidateNewFingerprint(userId,host_addr, jsonFp, accept, accept_charset, accept_encoding, accept_lang);
         if (dfpVal != null) {
             String output = XMLUtil.convertObjectToXML(dfpVal);

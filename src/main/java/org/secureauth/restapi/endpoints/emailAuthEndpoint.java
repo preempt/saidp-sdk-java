@@ -9,8 +9,8 @@ import org.secureauth.sarestapi.util.XMLUtil;
  */
 public class emailAuthEndpoint {
 
-    public static String sendOtpByEmail(String host, String port, Boolean ssl, String realm, String appId, String appKey, String userId, String factorId){
-        SAAccess saAccess =  new SAAccess(host, port, ssl, realm, appId, appKey);
+    public static String sendOtpByEmail(String host, String port, boolean ssl,boolean selfSigned, String realm, String appId, String appKey, String userId, String factorId){
+        SAAccess saAccess =  new SAAccess(host, port, ssl,selfSigned, realm, appId, appKey);
         ResponseObject emailResp = saAccess.deliverOTPByEmail(userId, factorId);
         if (emailResp != null)
         {
