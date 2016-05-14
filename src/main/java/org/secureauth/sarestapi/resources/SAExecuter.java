@@ -53,6 +53,11 @@ public class SAExecuter {
     private Client client=null;
     private static Logger logger=LoggerFactory.getLogger(SAExecuter.class);
 
+    private SABaseURL saBaseURL = null;
+    public SAExecuter(SABaseURL saBaseURL){
+        this.saBaseURL = saBaseURL;
+    }
+
     //Set up our Connection
     private void createConnection() throws Exception{
 
@@ -79,13 +84,15 @@ public class SAExecuter {
         ctx.init(null, certs, new SecureRandom());
 
         try{
+
+
             client = ClientBuilder.newBuilder()
                     .withConfig(config)
                     .sslContext(ctx)
                     .hostnameVerifier(new HostnameVerifier() {
                         @Override
                         public boolean verify(String s, SSLSession sslSession) {
-                            return true;
+                            return saBaseURL.isSelfSigned();
                         }
                     })
                     .build();
