@@ -12,7 +12,7 @@ import java.io.*;
  */
 public class EndpointExample {
 
-    private static String applianceHost = "host.domain.com";
+    private static String applianceHost = "host.company.com";
     private static String appliancePort = "443";
     private static boolean applianceSSL = true;
     private static boolean selfSigned = true;
@@ -88,6 +88,13 @@ public class EndpointExample {
         System.out.println(adaptAuth);
         System.out.println("++++++++++++End AdaptiveAuth Test++++++++++++");
 
+
+        //accessHistoryEndpoint get XML test.
+        String accessHistory = accessHistoryEndpoint.getAccessHistoryEndpoint(applianceHost, appliancePort, applianceSSL,selfSigned, realm, applicationID, applicationKey, userId, host_addr);
+        System.out.println("++++++++++++Start AccessHistory Test++++++++++++");
+        System.out.println(accessHistory);
+        System.out.println("++++++++++++End AccessHistory Test++++++++++++");
+
         //emailAuthEndpoint get XML test.
         String emailAuth = emailAuthEndpoint.sendOtpByEmail(applianceHost, appliancePort, applianceSSL,selfSigned, realm, applicationID, applicationKey, userId, emailFactorId);
         System.out.println("++++++++++++Start Deliver OTP By Email Test++++++++++++");
@@ -109,7 +116,7 @@ public class EndpointExample {
         System.out.println("++++++++++++++++++End Test++++++++++++++++++");
     }
 
-    public static String getCharacterDataFromElement(Element e) {
+    private static String getCharacterDataFromElement(Element e) {
         Node child = e.getFirstChild();
         if (child instanceof CharacterData) {
             CharacterData cd = (CharacterData) child;
