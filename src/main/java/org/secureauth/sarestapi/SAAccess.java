@@ -121,13 +121,16 @@ import org.slf4j.LoggerFactory;
         String header = restApiHeader.getAuthorizationHeader(saAuth,"GET",FactorsQuery.queryFactors(saAuth.getRealm(),userid),ts);
 
 
-        try{
+        try
+        {
             return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactors(saAuth.getRealm(),userid),ts, FactorsResponse.class);
 
-        }catch (Exception e){
-        logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
-    }
-        return null;
+        }
+        catch (Exception e)
+        {
+            String errorMessage = new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString();
+            throw new IllegalStateException(errorMessage);
+        }
     }
 
     /**
@@ -160,12 +163,15 @@ import org.slf4j.LoggerFactory;
         req.setPush_accept_details(pad);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), req,ts);
 
-        try{
+        try
+        {
             return saExecuter.executePostRequest(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), req,ts, ResponseObject.class);
-        }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
-        return null;
+        catch (Exception e)
+        {
+            String errorMessage = "Exception occurred executing REST query::\n" + e.getMessage() + "\n";
+            throw new IllegalStateException(errorMessage);
+        }
     }
     
     /**
@@ -185,7 +191,7 @@ import org.slf4j.LoggerFactory;
         try{
             return saExecuter.executePostRequest(header,saBaseURL.getApplianceURL() + AuthQuery.queryAAuth(saAuth.getRealm()), req, ts, AdaptiveAuthResponse.class);
         }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+            logger.error("Exception occurred executing REST query::\n" + e.getMessage() + "\n", e);
         }
         return null;
     }
@@ -196,12 +202,15 @@ import org.slf4j.LoggerFactory;
         String getUri = AuthQuery.queryAuth(saAuth.getRealm()) + "/" + refId;
         String header = restApiHeader.getAuthorizationHeader(saAuth,"GET", getUri,ts);
 
-        try{
+        try
+        {
             return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + getUri,ts, PushAcceptStatus.class);
-        }catch (Exception e){
-            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
-        return null;
+        catch (Exception e)
+        {
+            String errorMessage = "Exception occurred executing REST query::\n" + e.getMessage() + "\n";
+            throw new IllegalStateException(errorMessage);
+        }
     }
     
 
@@ -720,11 +729,15 @@ import org.slf4j.LoggerFactory;
         At a minimum creating a user requires UserId and Passowrd
          */
         if(newUserProfile.getUserId() != null && !newUserProfile.getUserId().isEmpty() && newUserProfile.getPassword() != null && !newUserProfile.getPassword().isEmpty()){
-            try{
+            try
+            {
                 return saExecuter.executeUserProfileCreateRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts,ResponseObject.class);
 
-            }catch (Exception e){
+            }
+            catch (Exception e)
+            {
                 logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+                throw new IllegalStateException(e.getMessage());
             }
         }
         return null;

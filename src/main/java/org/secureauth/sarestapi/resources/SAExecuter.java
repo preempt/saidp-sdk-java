@@ -134,9 +134,11 @@ public class SAExecuter {
                     get();
             genericResponse = response.readEntity(valueType);
             response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Get Request: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+        }
+        catch(Exception e)
+        {
+            String errorMessage = "Exception Get Request: \nQuery:\n\t" + query + "\nError:" + e.getMessage();
+            throw new IllegalStateException(errorMessage);
         }
 
         return genericResponse;
@@ -407,9 +409,11 @@ public class SAExecuter {
 
             responseObject=response.readEntity(valueType);
             response.close();
-        }catch(Exception e){
-            logger.error(new StringBuilder().append("Exception Delivering OTP by Push: \nQuery:\n\t")
-                    .append(query).append("\nError:").append(e.getMessage()).toString(), e);
+        }
+        catch(Exception e)
+        {
+            String errorMessage = "Exception Delivering OTP by Push: \nQuery:\n\t" + query + "\nError:" + e.getMessage();
+            throw new IllegalStateException(errorMessage);
         }
 
         return responseObject;
