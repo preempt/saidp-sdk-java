@@ -47,6 +47,11 @@ dependencies {
     compile('org.slf4j:slf4j-api:1.7.13')
 }
 
+task copyToLib( type: Copy, overwrite: true ) {
+    into "$buildDir/libs/lib"
+    from configurations.runtime
+}
+
 build.dependsOn(copyToLib)
 build.dependsOn(javadoc)
 
