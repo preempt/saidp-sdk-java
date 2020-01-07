@@ -55,8 +55,6 @@ public class JSONUtil {
 
         }catch(JsonProcessingException jpe){
             jpe.printStackTrace();
-        }catch(IOException ie){
-            ie.printStackTrace();
         }
 
         return dfpValidateRequest;
