@@ -1,6 +1,8 @@
 package org.secureauth.sarestapi.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.secureauth.sarestapi.resources.s;
 import org.secureauth.sarestapi.util.JSONUtil;
 
@@ -28,12 +30,14 @@ OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
 
 @XmlRootElement(name= s.FACTORS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Factors {
 
     private String type;
     private String id;
     private String value;
     private ArrayList<String> capabilities;
+    private ArrayList<String> biometricTypes;
 
     public String getType() {
         return type;
@@ -65,6 +69,14 @@ public class Factors {
 
     public void setCapabilities(ArrayList<String> capabilities) {
         this.capabilities = capabilities;
+    }
+
+    public ArrayList<String> getBiometricTypes() {
+        return biometricTypes;
+    }
+
+    public void setBiometricTypes(ArrayList<String> biometricTypes) {
+        this.biometricTypes = biometricTypes;
     }
 
     @Override

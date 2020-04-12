@@ -7,6 +7,7 @@ import java.util.TimeZone;
 
 import org.secureauth.sarestapi.data.*;
 import org.secureauth.sarestapi.data.BehavioralBio.BehaveBioRequest;
+import org.secureauth.sarestapi.data.DFP.DFP;
 import org.secureauth.sarestapi.data.NumberProfile.CarrierInfo;
 import org.secureauth.sarestapi.data.Requests.BehaveBioResetRequest;
 import org.secureauth.sarestapi.data.Response.BehaveBioResponse;
@@ -33,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 
- public class SAAccess {
+public class SAAccess {
 
     private static Logger logger = LoggerFactory.getLogger(SAAccess.class);
     protected SABaseURL saBaseURL;
@@ -116,27 +117,22 @@ import org.slf4j.LoggerFactory;
      * @return {@link FactorsResponse}
      */
     public FactorsResponse factorsByUser(String userid){
-//    	userid = encode(userid);
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         String header = restApiHeader.getAuthorizationHeader(saAuth,"GET",FactorsQuery.queryFactors(saAuth.getRealm(),userid),ts);
 
 
-        try
-        {
+        try{
             return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + FactorsQuery.queryFactors(saAuth.getRealm(),userid),ts, FactorsResponse.class);
 
-        }
-        catch (Exception e)
-        {
-            String errorMessage = new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString();
-            throw new IllegalStateException(errorMessage);
+        }catch (Exception e){
+            throw new IllegalStateException(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
     }
 
     /**
      * <p>
-     *     Send push to accept request asynchronously 
+     *     Send push to accept request asynchronously
      * </p>
      *
      * @param userid  the user id of the identity
@@ -147,34 +143,81 @@ import org.slf4j.LoggerFactory;
      * @return {@link FactorsResponse}
      */
     public ResponseObject sendPushToAcceptReq(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription){
+       return sendPushReq(userid, factor_id, endUserIP, clientCompany, clientDescription, "push_accept");
+    }
+
+    public ResponseObject sendPushToAcceptSymbolReq(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription){
+        return sendPushReq(userid, factor_id, endUserIP, clientCompany, clientDescription, "push_accept_symbol");
+    }
+
+    private ResponseObject sendPushReq(String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription, String type) {
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         PushToAcceptRequest req = new PushToAcceptRequest();
         req.setUser_id(userid);
-        req.setType("push_accept");
+        req.setType(type);
         req.setFactor_id(factor_id);
         PushAcceptDetails pad = new PushAcceptDetails();
         pad.setEnduser_ip(endUserIP);
         if (clientCompany != null) {
-        	pad.setCompany_name(clientCompany);
+            pad.setCompany_name(clientCompany);
         }
         if (clientDescription != null) {
-        	pad.setApplication_description(clientDescription);
+            pad.setApplication_description(clientDescription);
         }
         req.setPush_accept_details(pad);
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), req,ts);
 
-        try
-        {
+        try{
             return saExecuter.executePostRequest(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), req,ts, ResponseObject.class);
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
-        catch (Exception e)
-        {
-            String errorMessage = "Exception occurred executing REST query::\n" + e.getMessage() + "\n";
-            throw new IllegalStateException(errorMessage);
+        return null;
+    }
+
+    /**
+     * <p>
+     *     Send push to accept biometric request asynchronously
+     * </p>
+     *
+     * @param biometricType fingerprint, face
+     * @param userid  the user id of the identity
+     * @param factor_id the P2A Id to be compared against
+     * @param endUserIP The End Users IP Address
+     * @param clientCompany The Client Company Name
+     * @param clientDescription The Client Description
+     * @return {@link FactorsResponse}
+     */
+    public ResponseObject sendPushBiometricReq(String biometricType, String userid, String factor_id, String endUserIP, String clientCompany, String clientDescription) {
+        String ts = this.getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        PushToAcceptBiometricsRequest req = new PushToAcceptBiometricsRequest();
+        req.setUser_id(userid);
+        req.setType("push_accept_biometric");
+        req.setFactor_id( factor_id );
+        req.setBiometricType( biometricType );
+        PushAcceptDetails pad = new PushAcceptDetails();
+        pad.setEnduser_ip(endUserIP);
+        if (clientCompany != null) {
+            pad.setCompany_name(clientCompany);
+        }
+
+        if (clientDescription != null) {
+            pad.setApplication_description(clientDescription);
+        }
+
+        req.setPush_accept_details(pad);
+        String header = restApiHeader.getAuthorizationHeader(this.saAuth, "POST", AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts);
+
+        try {
+            return (ResponseObject)this.saExecuter.executePostRequest(header, this.saBaseURL.getApplianceURL() + AuthQuery.queryAuth(this.saAuth.getRealm()), req, ts, ResponseObject.class);
+        } catch (Exception var12) {
+            logger.error("Exception occurred executing REST query::\n" + var12.getMessage() + "\n", var12);
+            return null;
         }
     }
-    
+
     /**
      * <p>
      *     Perform adaptive auth query
@@ -192,28 +235,25 @@ import org.slf4j.LoggerFactory;
         try{
             return saExecuter.executePostRequest(header,saBaseURL.getApplianceURL() + AuthQuery.queryAAuth(saAuth.getRealm()), req, ts, AdaptiveAuthResponse.class);
         }catch (Exception e){
-            logger.error("Exception occurred executing REST query::\n" + e.getMessage() + "\n", e);
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
         return null;
     }
-    
+
     public PushAcceptStatus queryPushAcceptStatus(String refId){
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         String getUri = AuthQuery.queryAuth(saAuth.getRealm()) + "/" + refId;
         String header = restApiHeader.getAuthorizationHeader(saAuth,"GET", getUri,ts);
 
-        try
-        {
+        try{
             return saExecuter.executeGetRequest(header,saBaseURL.getApplianceURL() + getUri,ts, PushAcceptStatus.class);
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
-        catch (Exception e)
-        {
-            String errorMessage = "Exception occurred executing REST query::\n" + e.getMessage() + "\n";
-            throw new IllegalStateException(errorMessage);
-        }
+        return null;
     }
-    
+
 
 
     /**
@@ -225,7 +265,6 @@ import org.slf4j.LoggerFactory;
      * @return {@link ResponseObject}
      */
     public BaseResponse validateUser(String userid){
-
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         AuthRequest authRequest = new AuthRequest();
@@ -437,6 +476,33 @@ import org.slf4j.LoggerFactory;
         return null;
     }
 
+
+    /**
+     * <p>
+     *     Validate One Time Passcode sent by SMS
+     * </p>
+     * @param userid the userid of the identity
+     * @param otp  OTP Value to compare against what was sent
+     * @return {@link ValidateOTPResponse}
+     */
+    public ValidateOTPResponse validateOTP(String userid, String otp){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        ValidateOTPRequest validateOTPRequest = new ValidateOTPRequest();
+
+        validateOTPRequest.setUser_id(userid);
+        validateOTPRequest.setOtp(otp);
+
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", ValidateOTPQuery.queryValidateOTP(saAuth.getRealm()), validateOTPRequest,ts);
+
+        try{
+            return saExecuter.executeValidateOTP(header,saBaseURL.getApplianceURL() + ValidateOTPQuery.queryValidateOTP(saAuth.getRealm()),validateOTPRequest,ts);
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
     /**
      * <p>
      *     Send One Time Passcode by SMS Ad Hoc
@@ -457,6 +523,32 @@ import org.slf4j.LoggerFactory;
 
         try{
             return saExecuter.executeOTPBySMS(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()),authRequest,ts);
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
+        return null;
+    }
+
+        /**
+     * <p>
+     *     Send One Time Passcode by Email to Help Desk
+     * </p>
+     * @param userid the userid of the identity
+     * @param factor_id  Help Desk Property   "HelpDesk1"
+     * @return {@link ResponseObject}
+     */
+    public ResponseObject deliverHelpDeskOTPByEmail(String userid, String factor_id){
+        String ts = getServerTime();
+        RestApiHeader restApiHeader = new RestApiHeader();
+        AuthRequest authRequest = new AuthRequest();
+
+        authRequest.setUser_id(userid);
+        authRequest.setType("help_desk");
+        authRequest.setFactor_id(factor_id);
+        String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
+
+        try{
+            return saExecuter.executeOTPByEmail(header,saBaseURL.getApplianceURL() + AuthQuery.queryAuth(saAuth.getRealm()), authRequest,ts);
         }catch (Exception e){
             logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
         }
@@ -606,7 +698,7 @@ import org.slf4j.LoggerFactory;
      * @return {@link DFPConfirmResponse}
      *
      */
-      public DFPConfirmResponse DFPConfirm(String userid, String fingerprint_id){
+    public DFPConfirmResponse DFPConfirm(String userid, String fingerprint_id){
         String ts = getServerTime();
         RestApiHeader restApiHeader =new RestApiHeader();
         DFPConfirmRequest dfpConfirmRequest =new DFPConfirmRequest();
@@ -634,27 +726,17 @@ import org.slf4j.LoggerFactory;
      * @param userid The User ID that you want to validate from
      * @param host_address The ID of the finger print to check against the data store
      * @param jsonString The JSON String provided by the Java Script
-     * @param accept  Accept Value provided by the application to buidl the Digital Finger Print
-     * @param accept_charset The accept Charset supplied by the client from the application server
-     * @param accept_encoding The accept Encoding supplied by the client from the application server
-     * @param accept_language The accepted language by the client supplied by the application server
      * @return {@link DFPValidateResponse}
      *
      */
-    public DFPValidateResponse DFPValidateNewFingerprint(String userid, String host_address, String jsonString, String accept, String accept_charset, String accept_encoding, String accept_language){
+    public DFPValidateResponse DFPValidateNewFingerprint(String userid, String host_address, String jsonString){
         String ts = getServerTime();
         RestApiHeader restApiHeader =new RestApiHeader();
-        DFPValidateRequest dfpValidateRequest = JSONUtil.getObjectFromJSONString(jsonString);
+        DFPValidateRequest dfpValidateRequest = new DFPValidateRequest();
+        DFP dfp = JSONUtil.getDFPFromJSONString(jsonString);
+        dfpValidateRequest.setFingerprint(dfp);
         dfpValidateRequest.setUser_id(userid);
         dfpValidateRequest.setHost_address(host_address);
-        dfpValidateRequest.getFingerprint().setAccept(accept);
-        dfpValidateRequest.getFingerprint().setAccept_charset(accept_charset);
-        dfpValidateRequest.getFingerprint().setAccept_language(accept_language);
-        dfpValidateRequest.getFingerprint().setAccept_encoding(accept_encoding);
-
-
-
-
 
         String header = restApiHeader.getAuthorizationHeader(saAuth,"POST", DFPQuery.queryDFPValidate(saAuth.getRealm()), dfpValidateRequest, ts);
 
@@ -811,15 +893,11 @@ import org.slf4j.LoggerFactory;
         At a minimum creating a user requires UserId and Passowrd
          */
         if(newUserProfile.getUserId() != null && !newUserProfile.getUserId().isEmpty() && newUserProfile.getPassword() != null && !newUserProfile.getPassword().isEmpty()){
-            try
-            {
+            try{
                 return saExecuter.executeUserProfileCreateRequest(header,saBaseURL.getApplianceURL() + IDMQueries.queryUsers(saAuth.getRealm()),newUserProfile,ts,ResponseObject.class);
 
-            }
-            catch (Exception e)
-            {
+            }catch (Exception e){
                 logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
-                throw new IllegalStateException(e.getMessage());
             }
         }
         return null;
@@ -839,16 +917,16 @@ import org.slf4j.LoggerFactory;
         String header = restApiHeader.getAuthorizationHeader(saAuth,"PUT",IDMQueries.queryUserProfile(saAuth.getRealm(),userId),userProfile,ts);
 
 
-            try{
-                return saExecuter.executeUserProfileUpdateRequest(header,
-                        saBaseURL.getApplianceURL() + IDMQueries.queryUserProfile(saAuth.getRealm(),userId),
-                        userProfile,
-                        ts,
-                        ResponseObject.class);
+        try{
+            return saExecuter.executeUserProfileUpdateRequest(header,
+                    saBaseURL.getApplianceURL() + IDMQueries.queryUserProfile(saAuth.getRealm(),userId),
+                    userProfile,
+                    ts,
+                    ResponseObject.class);
 
-            }catch (Exception e){
-                logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
-            }
+        }catch (Exception e){
+            logger.error(new StringBuilder().append("Exception occurred executing REST query::\n").append(e.getMessage()).append("\n").toString(), e);
+        }
 
         return null;
     }
@@ -946,7 +1024,6 @@ import org.slf4j.LoggerFactory;
      * @return {@link UserProfileResponse}
      */
     public UserProfileResponse getUserProfile(String userid){
-        userid = encode(userid);
         String ts = getServerTime();
         RestApiHeader restApiHeader = new RestApiHeader();
         String header = restApiHeader.getAuthorizationHeader(saAuth,"GET",IDMQueries.queryUserProfile(saAuth.getRealm(),userid),ts);
@@ -970,7 +1047,6 @@ import org.slf4j.LoggerFactory;
      * @return {@link ResponseObject}
      */
     public ResponseObject passwordReset(String userid, String password){
-        userid = encode(userid);
         String ts = getServerTime();
         UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
         userPasswordRequest.setPassword(password);
@@ -997,7 +1073,6 @@ import org.slf4j.LoggerFactory;
      * @return {@link ResponseObject}
      */
     public ResponseObject passwordChange(String userid, String currentPassword, String newPassword){
-        userid = encode(userid);
         String ts = getServerTime();
         UserPasswordRequest userPasswordRequest = new UserPasswordRequest();
         userPasswordRequest.setCurrentPassword(currentPassword);
@@ -1109,39 +1184,24 @@ import org.slf4j.LoggerFactory;
      * Start Helper Methods
      */
 
-    /**
-     *
-     * @param input The user String to be encoded
-     * @return String
-     */
-    public static String encode(String input) {
-        StringBuilder resultStr = new StringBuilder();
-        for (char ch : input.toCharArray()) {
-            if (isUnsafe(ch)) {
-                resultStr.append('%');
-                resultStr.append(toHex(ch / 16));
-                resultStr.append(toHex(ch % 16));
-            } else {
-                resultStr.append(ch);
-            }
-        }
-        return resultStr.toString();
-    }
-
-    private static char toHex(int ch) {
-        return (char) (ch < 10 ? '0' + ch : 'A' + ch - 10);
-    }
-
-    private static boolean isUnsafe(char ch) {
-        if (ch > 128 || ch < 0)
-            return true;
-        return " %$&+,/:;=?@<>#%".indexOf(ch) >= 0;
-    }
+    //to fetch raw json
+    public String executeGetRequest(String query) {
+		String ts = getServerTime();
+		RestApiHeader restApiHeader = new RestApiHeader();
+		query = saAuth.getRealm() + query;
+		String header = restApiHeader.getAuthorizationHeader(saAuth, "GET", query, ts);
+		try {
+			return saExecuter.executeRawGetRequest(header, saBaseURL.getApplianceURL() + query, ts);
+		} catch (Exception e) {
+			logger.error("Exception occurred executing REST query::\n" + e.getMessage() + "\n", e);
+		}
+		return null;
+	}
 
     String getServerTime() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+                "EEE, dd MMM yyyy HH:mm:ss.SSS z", Locale.US);
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         return dateFormat.format(calendar.getTime());
     }
